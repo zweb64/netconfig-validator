@@ -1,7 +1,11 @@
 from netmiko import ConnectHandler
 from getpass import getpass
 from src.parser import get_vlans, get_telnet_state, get_ssh_state
-
+from src.validator import (
+    validate_ssh_state,
+    validate_telnet_state,
+    validate_vlans,
+)
 def get_running_config(host, username, password, secret):
     device = {
         "device_type": "ubiquiti_edgeswitch",
@@ -36,7 +40,14 @@ if __name__ == "__main__":
     vlans = get_vlans(config_text)
     telnet_state = get_telnet_state(config_text)
     ssh_state = get_ssh_state(config_ssh)
+    ssh_validation = validate_ssh_state(ssh_state)
+    telnet_validation = validate_telnet_state(telnet_state)
+    expected_vlans = [10, 20]
+    vlan_validation = validate_vlans(vlans, expected_vlans)
 
     print("VLANs:", vlans)
     print("Telnet:", telnet_state)
     print("SSH:", ssh_state)
+    print(ssh_validation)
+    print(telnet_validation)
+    print(vlan_validation)
