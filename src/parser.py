@@ -60,7 +60,28 @@ def get_vlans(config_text):
                 if item != "":
                     item = int(item)
                     vlans_list.append(item)
-            return vlans_list
+        if line.strip() == "exit":
+            in_vlan_database = False
+    return vlans_list
+
+
+def get_telnet_state(config_text):
+    for line in config_text.splitlines():
+        if line.strip() == "ip telnet server enable":
+            return "Enabled"
+    return "Disabled"
+            
+                
+def get_ssh_state(config_ssh):
+    for line in config_ssh.splitlines():
+        if line.strip().startswith("Administrative Mode:"):
+            if "Enabled" in line: 
+                return "Enabled"
+            if "Disabled" in line:
+                return "Disabled"
+            else:
+                return "Unknown"
+    return "Unknown"
 
 if __name__ == "__main__":
     # load config
@@ -72,3 +93,4 @@ if __name__ == "__main__":
     print(get_system_uptime(config_text))
     print(get_additional_packages_list(config_text))
     print(get_vlans(config_text))
+    print(get_telnet_state(config_text))

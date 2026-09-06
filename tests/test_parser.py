@@ -1,4 +1,4 @@
-from src.parser import get_software_version, get_system_description, get_additional_packages_list, load_config_file, get_system_uptime, get_vlans
+from src.parser import get_software_version, get_system_description, get_additional_packages_list, load_config_file,  get_system_uptime, get_vlans, get_telnet_state, get_ssh_state
 
 import pytest
 
@@ -31,4 +31,63 @@ def test_get_system_uptime(config_text):
 
 def test_get_vlans(config_text):
     result = get_vlans(config_text)
-    assert result == [10, 20]
+    assert result == [10, 20, 30, 40]
+
+def test_telnet_state_enabled(config_text):
+    result = get_telnet_state(config_text)
+    assert result == "Enabled"
+
+def test_telnet_state_disabled():
+    telnet_disabled_config = """
+    line telnet
+    exit
+    """
+
+    result = get_telnet_state(telnet_disabled_config)
+
+    assert result is "Disabled"
+
+
+def test_get_ssh_state_enabled():
+    config_ssh = """
+SSH Configuration
+
+Administrative Mode: .......................... Enabled
+SSH Port: ..................................... 22
+Protocol Levels: .............................. Version 2
+SSH Sessions Currently Active: ................ 1
+Max SSH Sessions Allowed: ..................... 2
+SSH Timeout: .................................. 5
+Keys Present: ................................. DSA RSA
+Key Generation In Progress: ................... None
+"""
+
+    assert get_ssh_state(config_ssh) == "Enabled"
+
+
+def test_get_ssh_state_disabled():
+    config_ssh = """
+SSH Configuration
+
+Administrative Mode: .......................... Disabled
+SSH Port: ..................................... 22
+Protocol Levels: .............................. Version 2
+SSH Sessions Currently Active: ................ 0
+Max SSH Sessions Allowed: ..................... 2
+SSH Timeout: .................................. 5
+Keys Present: ................................. DSA RSA
+Key Generation In Progress: ................... None
+"""
+
+    assert get_ssh_state(config_ssh) == "Disabled"
+
+
+def test_get_ssh_state_unknown():
+    config_ssh = """
+SSH Configuration
+
+SSH Port: ..................................... 22
+Protocol Levels: .............................. Version 2
+"""
+
+    assert get_ssh_state(config_ssh) == "Unknown"
