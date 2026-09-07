@@ -1,22 +1,31 @@
-# Python cache files
+# Python
 __pycache__/
 *.py[cod]
+*$py.class
 
 # Virtual environments
 .venv/
 venv/
+env/
 
-# Pytest cache
+# Testing
 .pytest_cache/
+.coverage
+htmlcov/
 
-# IDE/editor files
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# IDE / editor
 .vscode/
 .idea/
 
-# Environment variables / secrets
-.env
-.env.*
-
-# OS-generated files
+# OS
 .DS_Store
 Thumbs.db
+
+# Local secrets / environment
+.env
+.env.*

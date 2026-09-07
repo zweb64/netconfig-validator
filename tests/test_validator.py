@@ -6,7 +6,7 @@ from src.validator import (
 
 
 def test_validate_ssh_state_enabled():
-    result = validate_ssh_state("Enabled")
+    result = validate_ssh_state("Enabled", "Enabled")
 
     assert result == {
         "rule": "SSH Enabled",
@@ -17,7 +17,7 @@ def test_validate_ssh_state_enabled():
 
 
 def test_validate_ssh_state_disabled():
-    result = validate_ssh_state("Disabled")
+    result = validate_ssh_state("Disabled", "Enabled")
 
     assert result == {
         "rule": "SSH Enabled",
@@ -28,7 +28,7 @@ def test_validate_ssh_state_disabled():
 
 
 def test_validate_ssh_state_unknown():
-    result = validate_ssh_state("Unknown")
+    result = validate_ssh_state("Unknown", "Enabled")
 
     assert result == {
         "rule": "SSH Enabled",
@@ -39,7 +39,7 @@ def test_validate_ssh_state_unknown():
 
 
 def test_validate_ssh_state_invalid():
-    result = validate_ssh_state("Banana")
+    result = validate_ssh_state("Banana", "Enabled")
 
     assert result == {
         "rule": "SSH Enabled",
@@ -50,7 +50,7 @@ def test_validate_ssh_state_invalid():
 
 
 def test_validate_telnet_state_disabled():
-    result = validate_telnet_state("Disabled")
+    result = validate_telnet_state("Disabled", "Disabled")
 
     assert result == {
         "rule": "Telnet Disabled",
@@ -61,7 +61,7 @@ def test_validate_telnet_state_disabled():
 
 
 def test_validate_telnet_state_enabled():
-    result = validate_telnet_state("Enabled")
+    result = validate_telnet_state("Enabled", "Disabled")
 
     assert result == {
         "rule": "Telnet Disabled",
@@ -72,7 +72,7 @@ def test_validate_telnet_state_enabled():
 
 
 def test_validate_telnet_state_invalid():
-    result = validate_telnet_state("Banana")
+    result = validate_telnet_state("Banana", "Disabled")
 
     assert result == {
         "rule": "Telnet Disabled",
@@ -80,6 +80,7 @@ def test_validate_telnet_state_invalid():
         "expected": "Disabled",
         "actual": "Banana"
     }
+
 
 def test_validate_vlans_exact_match():
     result = validate_vlans([10, 20], [10, 20])
@@ -131,3 +132,21 @@ def test_validate_vlans_missing_and_unexpected():
         "missing": [20],
         "unexpected": [30]
     }
+
+
+def test_validate_ssh_state_expected_disabled():
+    result = validate_ssh_state("Disabled", "Disabled")
+
+    assert result["status"] == "PASS"
+    assert result["expected"] == "Disabled"
+    assert result["actual"] == "Disabled"
+    assert result["rule"] == "SSH Disabled"
+
+
+def test_validate_telnet_state_expected_enabled():
+    result = validate_telnet_state("Enabled", "Enabled")
+
+    assert result["status"] == "PASS"
+    assert result["expected"] == "Enabled"
+    assert result["actual"] == "Enabled"
+    assert result["rule"] == "Telnet Enabled"

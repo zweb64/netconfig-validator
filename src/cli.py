@@ -15,9 +15,9 @@ def print_validation_results(result):
     rule = result["rule"]
     expected = result["expected"]
     actual = result["actual"]
-    print(f"{status} {rule}")
-    print(f"Expected: {expected}")
-    print(f"Actual: {actual}")
+    print(f"[{status}] {rule}")
+    print(f"       Expected: {expected}")
+    print(f"       Actual:   {actual}")
     if "missing" in result:
         missing_vlan = result["missing"]
         print(f"Missing: {missing_vlan}")
@@ -28,15 +28,13 @@ def print_validation_results(result):
 
 
 
-if __name__ == "__main__":
+def main():
     host = input("host: ")
     username = input("username:")
     password = getpass("password:")
     secret = getpass("enable secret:")
     while True:
-        username = input("username:")
-        password = getpass("password:")
-        secret = getpass("secret:")
+        
 
 
         device_data = get_running_config(host, username, password, secret)
@@ -47,11 +45,11 @@ if __name__ == "__main__":
             username = input("username:")
             password = getpass("password:")
             secret = getpass("enable secret:")
-        if device_data == "TIMEOUT":
+        elif device_data == "TIMEOUT":
             print("Unable to reach device. Please try another host.")
             host = input("host: ")
 
-        if device_data is not None and device_data != "TIMEOUT":
+        else:
             break
     
     
@@ -67,8 +65,46 @@ if __name__ == "__main__":
 
     vlan_validation = validate_vlans(vlans, EXPECTED_VLANS)
 
-    print_validation_results(ssh_validation)
+    validation_results = [
+    ssh_validation,
+    telnet_validation,
+    vlan_validation,
+    ]
+
     print()
-    print_validation_results(telnet_validation)
+    print("Network Configuration Validator")
+    print("================================")
+    print(f"Device: {host}")
     print()
-    print_validation_results(vlan_validation)
+
+    for result in validation_results:
+        print_validation_results(result)
+        print()
+
+    pass_count = 0
+    fail_count = 0
+    unknown_count = 0
+    error_count = 0
+
+    for result in validation_results:
+        status = result["status"]
+
+        if status == "PASS":
+            pass_count += 1
+        elif status == "FAIL":
+            fail_count += 1
+        elif status == "UNKNOWN":
+            unknown_count += 1
+        elif status == "ERROR":
+            error_count += 1
+
+    print("--------------------------------")
+    print(
+        f"Summary: {pass_count} PASS | "
+        f"{fail_count} FAIL | "
+        f"{unknown_count} UNKNOWN | "
+        f"{error_count} ERROR"
+    )
+
+if __name__ == "__main__":
+    main()

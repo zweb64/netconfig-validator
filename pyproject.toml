@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netconfig-validator"
+version = "1.0.0"
+description = "A Python network configuration validator for collecting, parsing, and validating network device state."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "netmiko>=4.4,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+]
+
+[project.scripts]
+netconfig-validator = "src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+namespaces = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
